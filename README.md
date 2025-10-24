@@ -2,6 +2,8 @@
 
 This is my implementation of the test task: **"Spin up a tiny GIS stack, publish the provided dataset in GeoServer (backed by PostGIS), expose a small FastAPI API, and render the layer with a React + OpenLayers viewer (legend, scale bar, identify)"**
 
+![Map Viewer](example.png)
+
 ## What's Built
 
 **Backend:**
