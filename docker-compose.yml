@@ -1,0 +1,79 @@
+services:
+  db:
+    image: postgis/postgis:17-3.4
+    container_name: gis_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.24.2
+    container_name: geoserver
+    environment:
+      - GEOSERVER_CSRF_DISABLED=true
+    volumes:
+      - geoserver_data:/opt/geoserver/data_dir
+    ports:
+      - "${GEOSERVER_PORT}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: gis_api
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
+      GEOSERVER_USER: ${GEOSERVER_USER}
+      GEOSERVER_PASSWORD: ${GEOSERVER_PASSWORD}
+      GEOSERVER_BASE_URL: ${GEOSERVER_BASE_URL:-http://geoserver:8080/geoserver}
+      PUBLIC_API_BASE: ${PUBLIC_API_BASE}
+    ports:
+      - "${API_PORT}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      geoserver:
+        condition: service_started
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: gis_web
+    environment:
+      - VITE_API_BASE=${PUBLIC_API_BASE}
+    ports:
+      - "${WEB_PORT}:80"
+    depends_on:
+      - api
+
+  gdal:
+    image: osgeo/gdal:alpine-small-3.6.3
+    container_name: gdal_cli
+    profiles: ["seed"]
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - ./data:/data:ro
+    entrypoint: ["/bin/sh", "-lc", "sleep infinity"]
+
+volumes:
+  db_data:
+  geoserver_data:

@@ -1,0 +1,24 @@
+# General
+.env
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / Vite
+node_modules/
+web/node_modules/
+web/dist/
+web/.vite/
+
+# Docker volumes (local)
+db_data/
+geoserver_data/
+
+# VS Code
+.vscode/

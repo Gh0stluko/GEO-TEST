@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIS Viewer</title>
+    <style>
+      html, body, #root { height: 100%; margin: 0; }
+      .legend { position: absolute; right: 10px; bottom: 10px; background: rgba(255,255,255,0.9); padding: 6px; border-radius: 4px; }
+      .identify { position: absolute; left: 10px; bottom: 10px; background: rgba(255,255,255,0.9); padding: 6px; border-radius: 4px; max-width: 300px; max-height: 40%; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+  </html>
